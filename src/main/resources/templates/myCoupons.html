@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 쿠폰 목록</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 헤더 영역: 로그인 상태에 따라 다른 버튼 표시 -->
+<header>
+    <h1>쿠폰 사이트</h1>
+    <div>
+        <div th:if="${session.currentUser != null}">
+            안녕하세요, <span th:text="${session.currentUser.name}"></span>님!
+            <a th:href="@{/logout}">
+                <button type="button">로그아웃</button>
+            </a>
+        </div>
+        <div th:if="${session.currentUser == null}">
+            <a th:href="@{/login}">
+                <button type="button">로그인</button>
+            </a>
+            <a th:href="@{/signup}">
+                <button type="button">회원가입</button>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- 메인 영역: 내 쿠폰 목록 출력 -->
+<main>
+    <h2>내 쿠폰 목록</h2>
+
+    <!-- 쿠폰 발급 결과나 기타 메시지 출력 -->
+    <div th:if="${message}" style="color: green;">
+        <p th:text="${message}"></p>
+    </div>
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+
+    <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+        <tr>
+            <th>쿠폰 ID</th>
+            <th>쿠폰 발급일</th>
+            <th>상태</th>
+            <th>사용</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- myCoupons 리스트를 출력 (각 항목은 CouponIssuance 객체라고 가정) -->
+        <tr th:each="coupon : ${myCoupons}">
+            <!-- CouponIssuance 객체의 coupon 필드 내 쿠폰 ID에 접근 -->
+            <td th:text="${coupon.couponId.couponId}">쿠폰 ID</td>
+            <td th:text="${coupon.issuanceDate}">쿠폰 발급일</td>
+            <td th:text="${coupon.status}">상태</td>
+            <td>
+                <form th:action="@{/useCoupon}" method="post">
+                    <!-- 쿠폰 발급 내역의 고유 ID를 전송 -->
+                    <input type="hidden" name="couponIssuanceId" th:value="${coupon.id}" />
+                    <button type="submit"
+                            th:disabled="${coupon.status == 'used'}">
+                        사용
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 필요 시 다른 페이지로 이동하는 버튼 -->
+    <div style="margin-top: 20px;">
+        <a th:href="@{/couponList}">
+            <button type="button">전체 쿠폰 보기</button>
+        </a>
+    </div>
+</main>
+</body>
+</html>

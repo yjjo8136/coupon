@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>쿠폰 목록</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- 헤더 영역: 로그인 상태에 따라 다른 버튼 표시 -->
+<header>
+    <h1>쿠폰 사이트</h1>
+    <div>
+        <div th:if="${session.currentUser != null}">
+            안녕하세요, <span th:text="${session.currentUser.name}"></span>님!
+            <a th:href="@{/logout}">
+                <button type="button">로그아웃</button>
+            </a>
+        </div>
+        <div th:if="${session.currentUser == null}">
+            <a th:href="@{/login}">
+                <button type="button">로그인</button>
+            </a>
+            <a th:href="@{/signup}">
+                <button type="button">회원가입</button>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- 쿠폰 발급 결과 메시지 -->
+    <div th:if="${message}" style="color: green;">
+        <p th:text="${message}"></p>
+    </div>
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+
+    <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+        <tr>
+            <th>쿠폰 ID</th>
+            <th>쿠폰 유형</th>
+            <th>만료일</th>
+            <th>발행 총 수량</th>
+            <th>남은 수량</th>
+            <th>동작</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="coupon : ${coupons}">
+            <td th:text="${coupon.couponId}">쿠폰 ID</td>
+            <td th:text="${coupon.couponType}">쿠폰 유형</td>
+            <td th:text="${coupon.expirationDate}">만료일</td>
+            <td th:text="${coupon.totalQuantity}">발행 총 수량</td>
+            <td th:text="${coupon.remainingQuantity}">남은 수량</td>
+            <td>
+                <form th:action="@{/issueCoupon}" method="post">
+                    <!-- 쿠폰 id만 전송 (userId는 서버 측 세션으로 처리) -->
+                    <input type="hidden" name="couponId" th:value="${coupon.couponId}" />
+                    <button type="submit" th:disabled="${coupon.remainingQuantity == 0}">
+                        쿠폰 받기
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 추가된 버튼: 내 쿠폰 페이지로 이동 -->
+    <div style="margin-top: 20px;">
+        <a th:href="@{/myCoupons}">
+            <button type="button">내 쿠폰 보기</button>
+        </a>
+    </div>
+
+    <!-- 기존 쿠폰 추가 페이지로 이동하는 버튼 -->
+    <div style="margin-top: 20px;">
+        <a th:href="@{/addCoupon}">
+            <button type="button">쿠폰 추가하기</button>
+        </a>
+    </div>
+</main>
+</body>
+</html>

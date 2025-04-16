@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>쿠폰 추가</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>쿠폰 추가</h1>
+<!-- coupon 객체를 바인딩하여 폼에 입력받은 데이터를 처리 -->
+<form th:action="@{/couponAdd}" th:object="${coupon}" method="post">
+    <div>
+        <label for="couponType">쿠폰 유형:</label>
+        <input type="text" id="couponType" th:field="*{couponType}" placeholder="쿠폰 유형을 입력하세요" required />
+    </div>
+    <div>
+        <label for="expirationDate">만료일 (YYYY-MM-DD):</label>
+        <input type="text" id="expirationDate" th:field="*{expirationDate}" placeholder="2025-12-31" required />
+    </div>
+    <div>
+        <label for="totalQuantity">발행 총 수량:</label>
+        <input type="number" id="totalQuantity" th:field="*{totalQuantity}" placeholder="발행 총 수량 입력" required />
+    </div>
+    <div>
+        <label for="remainingQuantity">남은 수량:</label>
+        <input type="number" id="remainingQuantity" th:field="*{remainingQuantity}" placeholder="남은 수량 입력" required />
+    </div>
+    <div>
+        <button type="submit">추가하기</button>
+    </div>
+</form>
+</body>
+</html>
