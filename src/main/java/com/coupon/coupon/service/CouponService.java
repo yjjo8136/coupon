@@ -6,6 +6,8 @@ import com.coupon.coupon.domain.User;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +24,16 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final UserRepository userRepository;
     private final CouponIssuanceRepository couponIssuanceRepository;
+    private final RedissonClient redissonClient;
 
     @Autowired
     public CouponService(CouponRepository couponRepository,
                          UserRepository userRepository,
-                         CouponIssuanceRepository couponIssuanceRepository) {
+                         CouponIssuanceRepository couponIssuanceRepository, RedissonClient redissonClient) {
         this.couponRepository = couponRepository;
         this.userRepository = userRepository;
         this.couponIssuanceRepository = couponIssuanceRepository;
+        this.redissonClient = redissonClient;
     }
 
     // 쿠폰 생성
@@ -57,29 +61,35 @@ public class CouponService {
 
     public boolean issueCoupon(Long couponId, Long userId) {
 
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다."));
+        RLock lock = redissonClient.getLock("couponLock:" + couponId);
+        lock.lock();
+        try {
+            Coupon coupon = couponRepository.findById(couponId)
+                    .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다."));
 
-        if (coupon.getRemainingQuantity() <= 0) {
-            return false;
+            if (coupon.getRemainingQuantity() <= 0) {
+                return false;
+            }
+
+            coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
+            couponRepository.save(coupon);
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+            CouponIssuance issuance = new CouponIssuance();
+            issuance.setCouponId(coupon);
+            issuance.setUserId(user);
+            issuance.setIssuanceDate(LocalDateTime.now().toString());
+            issuance.setStatus("issued");
+            issuance.setUsedAt(null);
+
+            couponIssuanceRepository.save(issuance);
+
+            return true;
+        } finally {
+            lock.unlock();
         }
-
-        coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
-        couponRepository.save(coupon);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-        CouponIssuance issuance = new CouponIssuance();
-        issuance.setCouponId(coupon);
-        issuance.setUserId(user);
-        issuance.setIssuanceDate(LocalDateTime.now().toString());
-        issuance.setStatus("issued");
-        issuance.setUsedAt(null);
-
-        couponIssuanceRepository.save(issuance);
-
-        return true;
     }
 
     public List<CouponIssuance> getMyCoupons(Long userId) {
