@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -46,13 +47,13 @@ public class CouponService {
         return couponRepository.findAll();
     }
 
-    // 쿠폰 삭제
-    public void deleteCoupon() {
-        // 쿠폰 삭제 로직
-    }
-
     // 쿠폰 사용
     public void useCoupon(CouponIssuance couponIssuance) {
+        // 쿠폰 사용 여부 확인
+        if (couponIssuance.getStatus().equals("used")) {
+            throw new RuntimeException("이미 사용된 쿠폰입니다.");
+        }
+
         // 쿠폰 사용 로직
         couponIssuance.setStatus("used");
         couponIssuance.setUsedAt(LocalDateTime.now());
@@ -62,8 +63,13 @@ public class CouponService {
     public boolean issueCoupon(Long couponId, Long userId) {
 
         RLock lock = redissonClient.getLock("couponLock:" + couponId);
-        lock.lock();
         try {
+            boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
+            if (!available) {
+                System.out.println("redisson getLock Timeout");
+                return false;
+            }
+
             Coupon coupon = couponRepository.findById(couponId)
                     .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다."));
 
@@ -71,8 +77,14 @@ public class CouponService {
                 return false;
             }
 
+            // 쿠폰 중복 발급 여부 확인
+            List<CouponIssuance> existingIssuances = couponIssuanceRepository.findByCouponIdAndUserId(couponId, userId);
+            if (!existingIssuances.isEmpty()) {
+                return false; // 이미 발급된 쿠폰이 있는 경우
+            }
+
             coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
-            couponRepository.save(coupon);
+            couponRepository.saveAndFlush(coupon);
 
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -87,6 +99,8 @@ public class CouponService {
             couponIssuanceRepository.save(issuance);
 
             return true;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }

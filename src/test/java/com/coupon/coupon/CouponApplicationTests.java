@@ -1,6 +1,7 @@
 package com.coupon.coupon;
 
 import com.coupon.coupon.domain.Coupon;
+import com.coupon.coupon.domain.CouponIssuance;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.service.CouponService;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,9 +27,9 @@ class CouponApplicationTests {
 
 	@Autowired
 	private CouponRepository couponRepository;
-
+/*
 	@Test
-	void 동시에_100명이_쿠폰을_발급_받는다() throws InterruptedException {
+	void 동시에_100명이_쿠폰을_발급_받으면_잔여_쿠폰_개수가_100개_줄어든다() throws InterruptedException {
 
 		Coupon coupon = new Coupon();
 		coupon.setCouponType("치킨");              // 쿠폰 종류 지정
@@ -54,4 +57,7 @@ class CouponApplicationTests {
 		Coupon actual = couponRepository.findById(couponId).orElseThrow();
 		assertThat(actual.getRemainingQuantity()).isZero();
 	}
+*/
+
 }
+

@@ -39,4 +39,10 @@ public class JpaCouponRepository implements CouponRepository{
                 .getResultList(); // 사용자 ID로 쿠폰 조회
     }
 
+    @Override
+    public void saveAndFlush(Coupon coupon) {
+        em.persist(coupon);
+        em.flush(); // 쿠폰 저장 후 즉시 반영
+    }
+
 }

@@ -19,9 +19,7 @@ public class CouponController {
 
     @GetMapping("/couponList")
     public String showCouponList(Model model) {
-        // 데이터베이스에서 쿠폰 목록을 조회
         List<Coupon> coupons = couponService.getAllCoupons();
-        // Model에 쿠폰 데이터를 추가
         model.addAttribute("coupons", coupons);
         // couponList.html 뷰를 반환
         return "couponList";

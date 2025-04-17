@@ -32,4 +32,12 @@ public class JpaCouponIssuanceRepository implements CouponIssuanceRepository {
                 .getSingleResult();
     }
 
+    @Override
+    public List<CouponIssuance> findByCouponIdAndUserId(Long couponId, Long userId) {
+        return em.createQuery("select ci from CouponIssuance ci where ci.coupon.id = :couponId and ci.user_id.id = :userId", CouponIssuance.class)
+                .setParameter("couponId", couponId)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
 }

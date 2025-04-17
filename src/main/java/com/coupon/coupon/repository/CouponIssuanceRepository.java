@@ -19,4 +19,6 @@ public interface CouponIssuanceRepository {
 
 
     CouponIssuance findByIssuanceId(Long couponIssuanceId);
+
+    List<CouponIssuance> findByCouponIdAndUserId(Long couponId, Long userId);
 }

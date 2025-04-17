@@ -2,6 +2,7 @@ package com.coupon.coupon.config;
 
 import com.coupon.coupon.repository.*;
 import com.coupon.coupon.service.CouponService;
+import com.coupon.coupon.service.UserService;
 import jakarta.persistence.EntityManager;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -9,6 +10,8 @@ import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SpringConfig {
@@ -34,6 +37,11 @@ public class SpringConfig {
         return new JpaUserRepository(em);
     }
 
+    @Bean
+    public UserService userService() {
+        return new UserService(userRepository());
+    }
+
     private CouponIssuanceRepository couponIssuanceRepository() {
         return new JpaCouponIssuanceRepository(em);
     }
@@ -44,5 +52,7 @@ public class SpringConfig {
         config.useSingleServer().setAddress("redis://127.0.0.1:6379");
         return Redisson.create(config);
     }
+
+
 
 }
