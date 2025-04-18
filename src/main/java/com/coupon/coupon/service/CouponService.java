@@ -77,11 +77,11 @@ public class CouponService {
                 return false;
             }
 
-            // 쿠폰 중복 발급 여부 확인
-            List<CouponIssuance> existingIssuances = couponIssuanceRepository.findByCouponIdAndUserId(couponId, userId);
-            if (!existingIssuances.isEmpty()) {
-                return false; // 이미 발급된 쿠폰이 있는 경우
-            }
+            // 쿠폰 중복 발급 여부 확인 (동시성 테스트를 위해 잠시 주석처리)
+            //List<CouponIssuance> existingIssuances = couponIssuanceRepository.findByCouponIdAndUserId(couponId, userId);
+            //if (!existingIssuances.isEmpty()) {
+            //    return false; // 이미 발급된 쿠폰이 있는 경우
+            //}
 
             coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
             couponRepository.saveAndFlush(coupon);

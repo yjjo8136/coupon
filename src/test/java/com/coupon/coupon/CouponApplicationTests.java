@@ -27,7 +27,7 @@ class CouponApplicationTests {
 
 	@Autowired
 	private CouponRepository couponRepository;
-/*
+
 	@Test
 	void 동시에_100명이_쿠폰을_발급_받으면_잔여_쿠폰_개수가_100개_줄어든다() throws InterruptedException {
 
@@ -57,7 +57,7 @@ class CouponApplicationTests {
 		Coupon actual = couponRepository.findById(couponId).orElseThrow();
 		assertThat(actual.getRemainingQuantity()).isZero();
 	}
-*/
+
 
 }
 

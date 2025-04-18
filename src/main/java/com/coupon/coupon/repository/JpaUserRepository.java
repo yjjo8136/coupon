@@ -3,6 +3,7 @@ package com.coupon.coupon.repository;
 import com.coupon.coupon.domain.User;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
 import java.util.Optional;
 
 public class JpaUserRepository implements UserRepository {
@@ -27,8 +28,9 @@ public class JpaUserRepository implements UserRepository {
     }
     @Override
     public User findByName(String name) {
-        return em.createQuery("select u from User u where u.name = :name", User.class)
+        List<User> users = em.createQuery("select u from User u where u.name = :name", User.class)
                 .setParameter("name", name)
-                .getSingleResult();
+                .getResultList();
+        return users.isEmpty() ? null : users.get(0);
     }
 }
