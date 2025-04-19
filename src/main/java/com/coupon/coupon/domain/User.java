@@ -9,6 +9,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long user_id;
     private String name;
+    private String role;
+
 
     public void setId(Long id) {
         this.user_id = id;
@@ -22,18 +24,11 @@ public class User {
     public String getName() {
         return name;
     }
-    public void setUserId(Long user_id) {
-        this.user_id = user_id;
+    public void setRole(String role) {
+        this.role = role;
     }
-    public Long getUserId() {
-        return user_id;
+    public String getRole() {
+        return role;
     }
-    public void setUserName(String name) {
-        this.name = name;
-    }
-    public String getUserName() {
-        return name;
-    }
-
 
 }

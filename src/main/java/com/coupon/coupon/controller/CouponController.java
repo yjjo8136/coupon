@@ -22,6 +22,7 @@ public class CouponController {
         return "redirect:/couponList";
     }
 
+    // 쿠폰 목록 페이지로 이동
     @GetMapping("/couponList")
     public String showCouponList(Model model) {
         List<Coupon> coupons = couponService.getAllCoupons();
@@ -34,7 +35,7 @@ public class CouponController {
     @GetMapping("/addCoupon")
     public String showCouponAddForm(Model model) {
         model.addAttribute("coupon", new Coupon());
-        return "couponAdd";
+        return "addCoupon";
     }
 
     // 쿠폰 추가 폼 제출 처리
@@ -64,6 +65,7 @@ public class CouponController {
         return "redirect:/couponList";
     }
 
+    // 사용자가 발급받은 쿠폰 목록 페이지로 이동
     @GetMapping("/myCoupons")
     public String showMyCoupons(HttpSession session, Model model) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
@@ -79,6 +81,7 @@ public class CouponController {
         return "myCoupons";
     }
 
+    // 쿠폰 사용 처리
     @PostMapping("/useCoupon")
     public String useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId, RedirectAttributes redirectAttributes) {
         CouponIssuance couponIssuance = couponService.getCouponIssuanceById(couponIssuanceId);

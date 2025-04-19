@@ -42,7 +42,7 @@ class CouponApplicationTests {
 		coupon.setRemainingQuantity(100L);          // 초기 남은 수량 100
 
 		couponService.createCoupon(coupon);		// 쿠폰 생성
-		Long couponId = coupon.getId();
+		Long couponId = coupon.getCouponId();
 
 		ExecutorService executorService = Executors.newFixedThreadPool(100);
 		CountDownLatch countDownLatch = new CountDownLatch(100);

@@ -7,8 +7,7 @@
 </head>
 <body>
 <h1>쿠폰 추가</h1>
-<!-- coupon 객체를 바인딩하여 폼에 입력받은 데이터를 처리 -->
-<form th:action="@{/couponAdd}" th:object="${coupon}" method="post">
+<form th:action="@{/addCoupon}" th:object="${coupon}" method="post">
     <div>
         <label for="couponType">쿠폰 유형:</label>
         <input type="text" id="couponType" th:field="*{couponType}" placeholder="쿠폰 유형을 입력하세요" required />
@@ -21,13 +20,25 @@
         <label for="totalQuantity">발행 총 수량:</label>
         <input type="number" id="totalQuantity" th:field="*{totalQuantity}" placeholder="발행 총 수량 입력" required />
     </div>
-    <div>
-        <label for="remainingQuantity">남은 수량:</label>
-        <input type="number" id="remainingQuantity" th:field="*{remainingQuantity}" placeholder="남은 수량 입력" required />
-    </div>
+    <!-- 남은 수량은 입력하지 않고, 발행 총 수량과 동일하게 설정 -->
+    <input type="hidden" id="remainingQuantity" th:field="*{remainingQuantity}" />
+
     <div>
         <button type="submit">추가하기</button>
     </div>
 </form>
+
+<script>
+    // 총 수량 입력 값이 바뀔 때마다 hidden 필드에 동일한 값을 설정
+    const totalQty = document.getElementById('totalQuantity');
+    const remainQty = document.getElementById('remainingQuantity');
+    totalQty.addEventListener('input', () => {
+        remainQty.value = totalQty.value;
+    });
+    // 초기 로드 시에도 동기화
+    window.addEventListener('DOMContentLoaded', () => {
+        remainQty.value = totalQty.value || '';
+    });
+</script>
 </body>
 </html>

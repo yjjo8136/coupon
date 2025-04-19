@@ -4,6 +4,7 @@ import com.coupon.coupon.repository.*;
 import com.coupon.coupon.service.CouponService;
 import com.coupon.coupon.service.UserService;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpSession;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -28,8 +29,8 @@ public class SpringConfig {
     }
 
     @Bean
-    public CouponService couponService() {
-        return new CouponService(couponRepository(), userRepository(), couponIssuanceRepository(), redissonClient());
+    public CouponService couponService(HttpSession httpSession) {
+        return new CouponService(couponRepository(), userRepository(), couponIssuanceRepository(), httpSession, redissonClient());
     }
 
     @Bean

@@ -16,8 +16,6 @@ public interface CouponIssuanceRepository {
 
     List<CouponIssuance> findByUserId(Long userId); // 사용자 ID로 쿠폰 발급 조회
 
-
-
     CouponIssuance findByIssuanceId(Long couponIssuanceId);
 
     List<CouponIssuance> findByCouponIdAndUserId(Long couponId, Long userId);

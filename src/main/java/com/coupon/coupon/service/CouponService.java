@@ -6,6 +6,7 @@ import com.coupon.coupon.domain.User;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -26,20 +27,30 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final UserRepository userRepository;
     private final CouponIssuanceRepository couponIssuanceRepository;
+    private final HttpSession httpSession;
     private final RedissonClient redissonClient;
+
 
     @Autowired
     public CouponService(CouponRepository couponRepository,
                          UserRepository userRepository,
-                         CouponIssuanceRepository couponIssuanceRepository, RedissonClient redissonClient) {
+                         CouponIssuanceRepository couponIssuanceRepository,
+                         HttpSession httpSession,
+                         RedissonClient redissonClient) {
         this.couponRepository = couponRepository;
         this.userRepository = userRepository;
         this.couponIssuanceRepository = couponIssuanceRepository;
+        this.httpSession = httpSession;
         this.redissonClient = redissonClient;
     }
 
     // 쿠폰 생성
     public void createCoupon(Coupon coupon) {
+        // 관리자 권한 확인
+        User currentUser = (User) httpSession.getAttribute("currentUser");
+        if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+            throw new RuntimeException("관리자만 쿠폰을 생성할 수 있습니다.");
+        }
         couponRepository.save(coupon);
     }
 

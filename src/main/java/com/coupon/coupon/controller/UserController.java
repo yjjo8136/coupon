@@ -22,10 +22,10 @@ public class UserController {
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("user", new User());
-        return "signup";  // signup.html 템플릿
+        return "signup";
     }
 
-    // 회원가입 처리: 이름만 입력받아서 회원을 생성
+    // 회원가입 처리: 이름만 입력받아서 회원 생성
     @PostMapping("/signup")
     public String signup(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
         if (userService.findByName(user.getName()) != null) {
