@@ -48,10 +48,15 @@ public class JpaCouponRepository implements CouponRepository{
     }
 
     @Override
-    public long decrementRemainingQuantity(Long couponId) {
-        return em.createQuery("UPDATE Coupon c SET c.remainingQuantity = c.remainingQuantity - 1 " + "WHERE c.id = :id")
+    public int decrementRemainingQuantity(Long couponId) {
+        return em.createQuery("UPDATE Coupon c " + "SET c.remaining_quantity = c.remaining_quantity - 1 " + "WHERE c.coupon_id = :id")
                 .setParameter("id", couponId)
                 .executeUpdate();
+    }
+
+    @Override
+    public Coupon getReference(Long couponId) {
+        return em.getReference(Coupon.class, couponId);
     }
 
 }

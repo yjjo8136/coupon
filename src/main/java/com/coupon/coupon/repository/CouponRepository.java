@@ -17,5 +17,8 @@ public interface CouponRepository {
 
     void saveAndFlush(Coupon coupon);
 
-    long decrementRemainingQuantity(Long couponId);
+    int decrementRemainingQuantity(Long couponId);
+
+    Coupon getReference(Long couponId);
+
 }

@@ -6,6 +6,7 @@ import com.coupon.coupon.domain.User;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
+import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,26 +63,39 @@ public class CouponService {
 
 
     public boolean issueCoupon(Long couponId, Long userId) {
-        // 1) 쿠폰 조회
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다. ID=" + couponId));
 
-        // 2) 남은 수량 확인
-        if (coupon.getRemainingQuantity() <= 0) {
+        RAtomicLong counter = redissonClient.getAtomicLong("coupon:remaining:" + couponId);
+
+        if (!counter.isExists()) {
+            long dbRemaining = couponRepository.findById(couponId)
+                    .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다. ID=" + couponId))
+                    .getRemainingQuantity();
+            counter.set(dbRemaining);
+        }
+
+        long remainAfterDecr = counter.decrementAndGet();
+        if (remainAfterDecr < 0) {
+            counter.incrementAndGet();
             return false;
         }
 
-        // 3) 수량 차감 및 저장
-        coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
-        couponRepository.save(coupon);
+        // DB 업데이트
+        int updated = couponRepository.decrementRemainingQuantity(couponId);
+        if (updated == 0) {
+            counter.incrementAndGet();
+            throw new RuntimeException("쿠폰이 존재하지 않습니다. ID=" + couponId);
+        }
 
-        // 4) 사용자 조회
+        // 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID=" + userId));
 
-        // 5) 발급 기록 생성 및 저장
+
+        Coupon couponProxy = couponRepository.getReference(couponId);
+
+        // 발급 기록 생성 및 저장
         CouponIssuance issuance = new CouponIssuance();
-        issuance.setCouponId(coupon);
+        issuance.setCouponId(couponProxy);
         issuance.setUserId(user);
         issuance.setIssuanceDate(LocalDateTime.now().toString());
         issuance.setStatus("issued");

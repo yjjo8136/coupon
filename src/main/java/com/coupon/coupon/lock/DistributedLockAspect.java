@@ -21,7 +21,7 @@ public class DistributedLockAspect {
     public DistributedLockAspect(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
     }
-
+/*
     @Around("execution(public boolean com.coupon.coupon..CouponService.issueCoupon(Long, Long))")
     public Object aroundIssueCoupon(ProceedingJoinPoint joinPoint) throws Throwable {
         // 메서드 인자에서 couponId 꺼내기
@@ -47,4 +47,6 @@ public class DistributedLockAspect {
             lock.unlock();
         }
     }
+
+ */
 }
