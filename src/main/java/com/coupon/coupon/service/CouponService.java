@@ -60,51 +60,37 @@ public class CouponService {
         couponIssuanceRepository.save(couponIssuance);
     }
 
+
     public boolean issueCoupon(Long couponId, Long userId) {
+        // 1) 쿠폰 조회
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다. ID=" + couponId));
 
-        RLock lock = redissonClient.getLock("couponLock:" + couponId);
-        try {
-            boolean available = lock.tryLock(10, 1, TimeUnit.SECONDS);
-            if (!available) {
-                System.out.println("redisson getLock Timeout");
-                return false;
-            }
-
-            Coupon coupon = couponRepository.findById(couponId)
-                    .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다."));
-
-            if (coupon.getRemainingQuantity() <= 0) {
-                return false;
-            }
-
-            // 쿠폰 중복 발급 여부 확인 (동시성 테스트를 위해 잠시 주석처리)
-            //List<CouponIssuance> existingIssuances = couponIssuanceRepository.findByCouponIdAndUserId(couponId, userId);
-            //if (!existingIssuances.isEmpty()) {
-            //    return false; // 이미 발급된 쿠폰이 있는 경우
-            //}
-
-            coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
-            couponRepository.saveAndFlush(coupon);
-
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-            CouponIssuance issuance = new CouponIssuance();
-            issuance.setCouponId(coupon);
-            issuance.setUserId(user);
-            issuance.setIssuanceDate(LocalDateTime.now().toString());
-            issuance.setStatus("issued");
-            issuance.setUsedAt(null);
-
-            couponIssuanceRepository.save(issuance);
-
-            return true;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            lock.unlock();
+        // 2) 남은 수량 확인
+        if (coupon.getRemainingQuantity() <= 0) {
+            return false;
         }
+
+        // 3) 수량 차감 및 저장
+        coupon.setRemainingQuantity(coupon.getRemainingQuantity() - 1);
+        couponRepository.save(coupon);
+
+        // 4) 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID=" + userId));
+
+        // 5) 발급 기록 생성 및 저장
+        CouponIssuance issuance = new CouponIssuance();
+        issuance.setCouponId(coupon);
+        issuance.setUserId(user);
+        issuance.setIssuanceDate(LocalDateTime.now().toString());
+        issuance.setStatus("issued");
+        issuance.setUsedAt(null);
+        couponIssuanceRepository.save(issuance);
+
+        return true;
     }
+
 
     public List<CouponIssuance> getMyCoupons(Long userId) {
         User user = userRepository.findById(userId)

@@ -10,6 +10,7 @@ import org.springframework.boot.actuate.autoconfigure.security.servlet.Managemen
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -30,6 +31,9 @@ class CouponApplicationTests {
 
 	@Test
 	void 동시에_100명이_쿠폰을_발급_받으면_잔여_쿠폰_개수가_100개_줄어든다() throws InterruptedException {
+
+		StopWatch sw = new StopWatch("concurrentIssueTest");
+		sw.start();
 
 		Coupon coupon = new Coupon();
 		coupon.setCouponType("치킨");              // 쿠폰 종류 지정
@@ -54,6 +58,10 @@ class CouponApplicationTests {
 		}
 
 		countDownLatch.await();
+
+		sw.stop();
+		System.out.println(sw.prettyPrint());
+
 		Coupon actual = couponRepository.findById(couponId).orElseThrow();
 		assertThat(actual.getRemainingQuantity()).isZero();
 	}

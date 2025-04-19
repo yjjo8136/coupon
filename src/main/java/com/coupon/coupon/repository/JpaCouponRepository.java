@@ -2,6 +2,8 @@ package com.coupon.coupon.repository;
 
 import com.coupon.coupon.domain.Coupon;
 import jakarta.persistence.EntityManager;
+import org.redisson.api.RAtomicLong;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,13 @@ public class JpaCouponRepository implements CouponRepository{
     public void saveAndFlush(Coupon coupon) {
         em.persist(coupon);
         em.flush(); // 쿠폰 저장 후 즉시 반영
+    }
+
+    @Override
+    public long decrementRemainingQuantity(Long couponId) {
+        return em.createQuery("UPDATE Coupon c SET c.remainingQuantity = c.remainingQuantity - 1 " + "WHERE c.id = :id")
+                .setParameter("id", couponId)
+                .executeUpdate();
     }
 
 }

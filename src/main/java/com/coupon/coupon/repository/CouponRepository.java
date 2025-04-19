@@ -16,4 +16,6 @@ public interface CouponRepository {
     List<Coupon> findByUserId(Long userId); // 사용자 ID로 쿠폰 조회
 
     void saveAndFlush(Coupon coupon);
+
+    long decrementRemainingQuantity(Long couponId);
 }

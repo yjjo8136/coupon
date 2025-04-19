@@ -17,6 +17,11 @@ public class CouponController {
     @Autowired
     private CouponService couponService;
 
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/couponList";
+    }
+
     @GetMapping("/couponList")
     public String showCouponList(Model model) {
         List<Coupon> coupons = couponService.getAllCoupons();
