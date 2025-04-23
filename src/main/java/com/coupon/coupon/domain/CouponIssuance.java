@@ -52,6 +52,12 @@ public class CouponIssuance {
     }
     public void setStatus(String status) {
         this.status = status;
+        this.used_at = LocalDateTime.now();
+    }
+
+    public void used() {
+        this.status = "used";
+        this.used_at = LocalDateTime.now();
     }
     public String getStatus() {
         return status;

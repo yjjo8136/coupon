@@ -49,10 +49,6 @@ public class CouponController {
     public String issueCoupon(@RequestParam("couponId") Long couponId, HttpSession session, RedirectAttributes redirectAttributes) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
         Object currentObj = session.getAttribute("currentUser");
-        if (currentObj == null) {
-            redirectAttributes.addFlashAttribute("error", "로그인 후 쿠폰을 발급받을 수 있습니다.");
-            return "redirect:/login";
-        }
 
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
@@ -70,9 +66,6 @@ public class CouponController {
     public String showMyCoupons(HttpSession session, Model model) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
         Object currentObj = session.getAttribute("currentUser");
-        if (currentObj == null) {
-            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-        }
 
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();

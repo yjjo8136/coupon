@@ -67,8 +67,8 @@ public class CouponService {
         }
 
         // 쿠폰 사용 로직
-        couponIssuance.setStatus("used");
-        couponIssuance.setUsedAt(LocalDateTime.now());
+        couponIssuance.used();
+//        couponIssuance.setUsedAt(LocalDateTime.now());
         couponIssuanceRepository.save(couponIssuance);
     }
 
