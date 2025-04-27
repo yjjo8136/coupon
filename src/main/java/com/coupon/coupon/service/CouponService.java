@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Transactional
 public class CouponService {
 
     private final CouponRepository couponRepository;
@@ -43,6 +42,7 @@ public class CouponService {
     }
 
     // 쿠폰 생성
+    @Transactional
     public void createCoupon(Coupon coupon) {
         // 관리자 권한 확인
         User currentUser = (User) httpSession.getAttribute("currentUser");
@@ -53,10 +53,12 @@ public class CouponService {
     }
 
     // 쿠폰 목록 조회
+    @Transactional(readOnly = true)
     public List<Coupon> getAllCoupons() {
         return couponRepository.findAll();
     }
 
+    @Transactional
     // 쿠폰 사용
     public void useCoupon(CouponIssuance couponIssuance) {
         // 쿠폰 사용 여부 확인
@@ -70,7 +72,7 @@ public class CouponService {
         couponIssuanceRepository.save(couponIssuance);
     }
 
-
+    @Transactional
     public boolean issueCoupon(Long couponId, Long userId) {
 
         RAtomicLong counter = redissonClient.getAtomicLong("coupon:remaining:" + couponId);
@@ -113,7 +115,7 @@ public class CouponService {
         return true;
     }
 
-
+    @Transactional(readOnly = true)
     public List<CouponIssuance> getMyCoupons(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -121,7 +123,7 @@ public class CouponService {
         return (List<CouponIssuance>) new ArrayList<CouponIssuance>(couponIssuance);
     }
 
-
+    @Transactional(readOnly = true)
     public CouponIssuance getCouponIssuanceById(Long couponIssuanceId) {
         return couponIssuanceRepository.findByIssuanceId(couponIssuanceId);
     }
