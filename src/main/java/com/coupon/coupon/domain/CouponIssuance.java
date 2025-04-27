@@ -15,13 +15,21 @@ public class CouponIssuance {
     private Coupon coupon_id;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user_id;
+    private User user;
     private String issuance_date;
     private LocalDateTime used_at;
     @Enumerated(EnumType.STRING)
     private CouponIssuanceStatus status;
 
+    // Hibernate는 무조건 파라미터가 없는 public 생성자가 있어야 한다.
     public CouponIssuance() {
+    }
+
+    public CouponIssuance(Coupon coupon, User user) {
+        this.coupon_id = coupon;
+        this.user = user;
+        this.issuance_date = LocalDateTime.now().toString();
+        this.used_at = null;
         this.status = CouponIssuanceStatus.ISSUED;
     }
 
@@ -39,11 +47,11 @@ public class CouponIssuance {
     public Coupon getCouponId() {
         return coupon_id;
     }
-    public void setUserId(User user_id) {
-        this.user_id = user_id;
+    public void setUserId(User user) {
+        this.user = user;
     }
     public User getUserId() {
-        return user_id;
+        return user;
     }
     public void setIssuanceDate(String issuance_date) {
         this.issuance_date = issuance_date;
@@ -69,4 +77,5 @@ public class CouponIssuance {
         this.status = CouponIssuanceStatus.USED;
         this.used_at = LocalDateTime.now();
     }
+
 }

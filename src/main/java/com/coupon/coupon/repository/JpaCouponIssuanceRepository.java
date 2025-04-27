@@ -19,7 +19,7 @@ public class JpaCouponIssuanceRepository implements CouponIssuanceRepository {
 
     @Override
     public List<CouponIssuance> findByUserId(Long userId) {
-        return em.createQuery("select ci from CouponIssuance ci where ci.user_id.id = :userId", CouponIssuance.class)
+        return em.createQuery("select ci from CouponIssuance ci where ci.user.id = :userId", CouponIssuance.class)
                 .setParameter("userId", userId)
                 .getResultList();
     }

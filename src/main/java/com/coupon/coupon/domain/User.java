@@ -7,17 +7,17 @@ import jakarta.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    private Long id;
     private String name;
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
 
     public void setId(Long id) {
-        this.user_id = id;
+        this.id = id;
     }
     public Long getId() {
-        return user_id;
+        return id;
     }
     public void setName(String name) {
         this.name = name;

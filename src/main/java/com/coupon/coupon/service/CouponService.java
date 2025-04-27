@@ -68,7 +68,6 @@ public class CouponService {
 
         // 쿠폰 사용 로직
         couponIssuance.used();
-//        couponIssuance.setUsedAt(LocalDateTime.now());
         couponIssuanceRepository.save(couponIssuance);
     }
 
@@ -105,11 +104,7 @@ public class CouponService {
         Coupon couponProxy = couponRepository.getReference(couponId);
 
         // 발급 기록 생성 및 저장
-        CouponIssuance issuance = new CouponIssuance();
-        issuance.setCouponId(couponProxy);
-        issuance.setUserId(user);
-        issuance.setIssuanceDate(LocalDateTime.now().toString());
-        issuance.setUsedAt(null);
+        CouponIssuance issuance = new CouponIssuance(couponProxy, user);
         couponIssuanceRepository.save(issuance);
 
         return true;
