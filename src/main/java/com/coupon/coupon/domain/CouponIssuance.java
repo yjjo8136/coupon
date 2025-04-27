@@ -18,7 +18,14 @@ public class CouponIssuance {
     private User user_id;
     private String issuance_date;
     private LocalDateTime used_at;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private CouponIssuanceStatus status;
+
+    public CouponIssuance() {
+        this.status = CouponIssuanceStatus.ISSUED;
+    }
+
+
 
     public void setId(Long id) {
         this.coupon_issuance_id = id;
@@ -50,18 +57,16 @@ public class CouponIssuance {
     public LocalDateTime getUsedAt() {
         return used_at;
     }
-    public void setStatus(String status) {
+    public void setStatus(CouponIssuanceStatus status) {
         this.status = status;
         this.used_at = LocalDateTime.now();
     }
-
-    public void used() {
-        this.status = "used";
-        this.used_at = LocalDateTime.now();
-    }
-    public String getStatus() {
+    public CouponIssuanceStatus getStatus() {
         return status;
     }
 
-
+    public void used() {
+        this.status = CouponIssuanceStatus.USED;
+        this.used_at = LocalDateTime.now();
+    }
 }

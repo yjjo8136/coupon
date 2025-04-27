@@ -2,6 +2,7 @@ package com.coupon.coupon.service;
 
 import com.coupon.coupon.domain.Coupon;
 import com.coupon.coupon.domain.CouponIssuance;
+import com.coupon.coupon.domain.CouponIssuanceStatus;
 import com.coupon.coupon.domain.User;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
@@ -62,7 +63,7 @@ public class CouponService {
     // 쿠폰 사용
     public void useCoupon(CouponIssuance couponIssuance) {
         // 쿠폰 사용 여부 확인
-        if (couponIssuance.getStatus().equals("used")) {
+        if (couponIssuance.getStatus().equals(CouponIssuanceStatus.USED)) {
             throw new RuntimeException("이미 사용된 쿠폰입니다.");
         }
 
@@ -109,7 +110,6 @@ public class CouponService {
         issuance.setCouponId(couponProxy);
         issuance.setUserId(user);
         issuance.setIssuanceDate(LocalDateTime.now().toString());
-        issuance.setStatus("issued");
         issuance.setUsedAt(null);
         couponIssuanceRepository.save(issuance);
 

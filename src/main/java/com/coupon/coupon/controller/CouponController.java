@@ -66,7 +66,6 @@ public class CouponController {
     public String showMyCoupons(HttpSession session, Model model) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
         Object currentObj = session.getAttribute("currentUser");
-
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
         List<CouponIssuance> myCoupons = couponService.getMyCoupons(userId);
