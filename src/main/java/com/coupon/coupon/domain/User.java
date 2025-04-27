@@ -9,7 +9,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long user_id;
     private String name;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
 
     public void setId(Long id) {
@@ -24,10 +25,10 @@ public class User {
     public String getName() {
         return name;
     }
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 

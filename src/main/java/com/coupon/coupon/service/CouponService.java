@@ -1,9 +1,6 @@
 package com.coupon.coupon.service;
 
-import com.coupon.coupon.domain.Coupon;
-import com.coupon.coupon.domain.CouponIssuance;
-import com.coupon.coupon.domain.CouponIssuanceStatus;
-import com.coupon.coupon.domain.User;
+import com.coupon.coupon.domain.*;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
@@ -49,7 +46,7 @@ public class CouponService {
     public void createCoupon(Coupon coupon) {
         // 관리자 권한 확인
         User currentUser = (User) httpSession.getAttribute("currentUser");
-        if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+        if (currentUser == null || !UserRole.ADMIN.equals(currentUser.getRole())) {
             throw new RuntimeException("관리자만 쿠폰을 생성할 수 있습니다.");
         }
         couponRepository.save(coupon);
