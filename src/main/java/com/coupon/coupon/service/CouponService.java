@@ -1,6 +1,8 @@
 package com.coupon.coupon.service;
 
 import com.coupon.coupon.domain.*;
+import com.coupon.coupon.exception.CustomErrorCode;
+import com.coupon.coupon.exception.CustomException;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +50,7 @@ public class CouponService {
         // 관리자 권한 확인
         User currentUser = (User) httpSession.getAttribute("currentUser");
         if (currentUser == null || !UserRole.ADMIN.equals(currentUser.getRole())) {
-            throw new RuntimeException("관리자만 쿠폰을 생성할 수 있습니다.");
+            throw new CustomException(CustomErrorCode.ACCESS_DENIED);
         }
         couponRepository.save(coupon);
     }
@@ -63,8 +66,15 @@ public class CouponService {
     public void useCoupon(CouponIssuance couponIssuance) {
         // 쿠폰 사용 여부 확인
         if (couponIssuance.getStatus().equals(CouponIssuanceStatus.USED)) {
-            throw new RuntimeException("이미 사용된 쿠폰입니다.");
+            throw new CustomException(CustomErrorCode.COUPON_ISSUANCE_ALREADY_USED);
         }
+
+        // 쿠폰 만료 여부 확인
+        //Coupon coupon = couponIssuance.getCoupon();
+        //LocalDateTime expireDateTime = LocalDateTime.parse(coupon.getExpirationDate());
+        //if (expireDateTime.isBefore(LocalDateTime.now())) {
+        //    throw new CustomException(CustomErrorCode.COUPON_EXPIRED);
+        //}
 
         // 쿠폰 사용 로직
         couponIssuance.used();
@@ -78,7 +88,7 @@ public class CouponService {
 
         if (!counter.isExists()) {
             long dbRemaining = couponRepository.findById(couponId)
-                    .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다. ID=" + couponId))
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.COUPON_NOT_FOUND))
                     .getRemainingQuantity();
             counter.set(dbRemaining);
         }
@@ -93,12 +103,12 @@ public class CouponService {
         int updated = couponRepository.decrementRemainingQuantity(couponId);
         if (updated == 0) {
             counter.incrementAndGet();
-            throw new RuntimeException("쿠폰이 존재하지 않습니다. ID=" + couponId);
+            throw new CustomException(CustomErrorCode.COUPON_OUT_OF_STOCK);
         }
 
         // 사용자 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다. ID=" + userId));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
 
 
         Coupon couponProxy = couponRepository.getReference(couponId);
@@ -113,7 +123,7 @@ public class CouponService {
     @Transactional(readOnly = true)
     public List<CouponIssuance> getMyCoupons(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
         List<CouponIssuance> couponIssuance = couponIssuanceRepository.findByUserId(user.getId());
         return (List<CouponIssuance>) new ArrayList<CouponIssuance>(couponIssuance);
     }

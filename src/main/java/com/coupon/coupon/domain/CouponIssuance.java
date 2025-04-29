@@ -12,7 +12,7 @@ public class CouponIssuance {
     private Long coupon_issuance_id;
     @ManyToOne
     @JoinColumn(name = "coupon_id", nullable = false)
-    private Coupon coupon_id;
+    private Coupon coupon;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -26,7 +26,7 @@ public class CouponIssuance {
     }
 
     public CouponIssuance(Coupon coupon, User user) {
-        this.coupon_id = coupon;
+        this.coupon = coupon;
         this.user = user;
         this.issuance_date = LocalDateTime.now().toString();
         this.used_at = null;
@@ -41,11 +41,11 @@ public class CouponIssuance {
     public Long getId() {
         return coupon_issuance_id;
     }
-    public void setCouponId(Coupon coupon_id) {
-        this.coupon_id = coupon_id;
+    public void setCoupon(Coupon coupon) {
+        this.coupon = coupon;
     }
-    public Coupon getCouponId() {
-        return coupon_id;
+    public Coupon getCoupon() {
+        return coupon;
     }
     public void setUserId(User user) {
         this.user = user;

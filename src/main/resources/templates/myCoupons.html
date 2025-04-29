@@ -52,7 +52,7 @@
         <!-- myCoupons 리스트를 출력 (각 항목은 CouponIssuance 객체라고 가정) -->
         <tr th:each="coupon : ${myCoupons}">
             <!-- CouponIssuance 객체의 coupon 필드 내 쿠폰 ID에 접근 -->
-            <td th:text="${coupon.couponId.couponId}">쿠폰 ID</td>
+            <td th:text="${coupon.coupon.couponId}">쿠폰 ID</td>
             <td th:text="${coupon.issuanceDate}">쿠폰 발급일</td>
             <td th:text="${coupon.status}">상태</td>
             <td>
@@ -60,7 +60,7 @@
                     <!-- 쿠폰 발급 내역의 고유 ID를 전송 -->
                     <input type="hidden" name="couponIssuanceId" th:value="${coupon.id}" />
                     <button type="submit"
-                            th:disabled="${coupon.status == 'used'}">
+                            th:disabled="${coupon.status == 'USED'}">
                         사용
                     </button>
                 </form>
