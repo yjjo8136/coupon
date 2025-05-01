@@ -5,6 +5,8 @@ import com.coupon.coupon.domain.CouponIssuance;
 import com.coupon.coupon.service.CouponService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,77 +14,52 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-@Controller
+@RestController
 public class CouponController {
     @Autowired
     private CouponService couponService;
 
-    @GetMapping("/")
-    public String index() {
-        return "redirect:/couponList";
-    }
-
-    // 쿠폰 목록 페이지로 이동
+    // 전체 쿠폰 목록 조회
     @GetMapping("/couponList")
-    public String showCouponList(Model model) {
-        List<Coupon> coupons = couponService.getAllCoupons();
-        model.addAttribute("coupons", coupons);
-        // couponList.html 뷰를 반환
-        return "couponList";
+    public List<Coupon> showCouponList(Model model) {
+        return couponService.getAllCoupons();
     }
 
-    // 쿠폰 추가 폼 페이지로 이동
-    @GetMapping("/addCoupon")
-    public String showCouponAddForm(Model model) {
-        model.addAttribute("coupon", new Coupon());
-        return "addCoupon";
-    }
-
-    // 쿠폰 추가 폼 제출 처리
+    // 쿠폰 추가
     @PostMapping("/addCoupon")
-    public String addCoupon(@ModelAttribute Coupon coupon) {
+    public ResponseEntity<String> addCoupon(@RequestBody Coupon coupon) {
         couponService.createCoupon(coupon);
-        return "redirect:/couponList";
+        return ResponseEntity.status(HttpStatus.CREATED).body("쿠폰이 성공적으로 추가되었습니다.");
     }
 
+    // 쿠폰 발급
     @PostMapping("/issueCoupon")
-    public String issueCoupon(@RequestParam("couponId") Long couponId, HttpSession session, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<String> issueCoupon(@RequestParam("couponId") Long couponId, HttpSession session, RedirectAttributes redirectAttributes) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
         Object currentObj = session.getAttribute("currentUser");
-
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
-        boolean issued = couponService.issueCoupon(couponId, userId);
-        if (issued) {
-            redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 발급되었습니다.");
-        } else {
-            redirectAttributes.addFlashAttribute("message", "이미 해당 쿠폰을 발급 받았거나 재고가 부족합니다.");
-        }
-        return "redirect:/couponList";
+
+        couponService.issueCoupon(couponId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body("쿠폰이 성공적으로 발급되었습니다.");
     }
 
-    // 사용자가 발급받은 쿠폰 목록 페이지로 이동
+    // 사용자가 발급받은 모든 쿠폰 조회
     @GetMapping("/myCoupons")
-    public String showMyCoupons(HttpSession session, Model model) {
+    public List<CouponIssuance> showMyCoupons(HttpSession session, Model model) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
         Object currentObj = session.getAttribute("currentUser");
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
-        List<CouponIssuance> myCoupons = couponService.getMyCoupons(userId);
-        model.addAttribute("myCoupons", myCoupons);
-        return "myCoupons";
+
+        return couponService.getMyCoupons(userId);
     }
 
-    // 쿠폰 사용 처리
+    // 쿠폰 사용
     @PostMapping("/useCoupon")
-    public String useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId, RedirectAttributes redirectAttributes) {
-        CouponIssuance couponIssuance = couponService.getCouponIssuanceById(couponIssuanceId);
-        if (couponIssuance != null) {
-            couponService.useCoupon(couponIssuance);
-            redirectAttributes.addFlashAttribute("message", "쿠폰이 성공적으로 사용되었습니다.");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "쿠폰 사용에 실패했습니다.");
-        }
-        return "redirect:/myCoupons";
+    public ResponseEntity<String> useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId, RedirectAttributes redirectAttributes) {
+        couponService.useCoupon(couponIssuanceId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("쿠폰이 성공적으로 사용되었습니다.");
     }
 }

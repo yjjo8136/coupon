@@ -1,8 +1,10 @@
 package com.coupon.coupon.exception;
 
-public class CustomErrorResponse {
+public class CustomErrorResponse<T> {
     private final int status;
     private final String message;
+
+    //private final T body;
 
     public CustomErrorResponse(int status, String message) {
         this.status = status;
@@ -12,6 +14,8 @@ public class CustomErrorResponse {
     public int getStatus() {
         return status;
     }
+
+
 
     public String getMessage() {
         return message;

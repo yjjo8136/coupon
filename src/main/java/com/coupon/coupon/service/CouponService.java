@@ -63,7 +63,14 @@ public class CouponService {
 
     @Transactional
     // 쿠폰 사용
-    public void useCoupon(CouponIssuance couponIssuance) {
+    public void useCoupon(Long couponIssuanceId) {
+
+        // 쿠폰 발급 기록 존재 여부 확인
+        CouponIssuance couponIssuance = couponIssuanceRepository.findByIssuanceId(couponIssuanceId);
+        if (couponIssuance == null) {
+            throw new CustomException(CustomErrorCode.COUPON_ISSUANCE_NOT_FOUND);
+        }
+
         // 쿠폰 사용 여부 확인
         if (couponIssuance.getStatus().equals(CouponIssuanceStatus.USED)) {
             throw new CustomException(CustomErrorCode.COUPON_ISSUANCE_ALREADY_USED);
@@ -93,23 +100,19 @@ public class CouponService {
             counter.set(dbRemaining);
         }
 
+        // Redis에서 쿠폰 재고 1 감소
         long remainAfterDecr = counter.decrementAndGet();
         if (remainAfterDecr < 0) {
             counter.incrementAndGet();
             return false;
         }
 
-        // DB 업데이트
-        int updated = couponRepository.decrementRemainingQuantity(couponId);
-        if (updated == 0) {
-            counter.incrementAndGet();
-            throw new CustomException(CustomErrorCode.COUPON_OUT_OF_STOCK);
-        }
+        // DB에서 쿠폰 재고 1 감소
+        couponRepository.decrementRemainingQuantity(couponId);
 
         // 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
-
 
         Coupon couponProxy = couponRepository.getReference(couponId);
 
@@ -128,8 +131,4 @@ public class CouponService {
         return (List<CouponIssuance>) new ArrayList<CouponIssuance>(couponIssuance);
     }
 
-    @Transactional(readOnly = true)
-    public CouponIssuance getCouponIssuanceById(Long couponIssuanceId) {
-        return couponIssuanceRepository.findByIssuanceId(couponIssuanceId);
-    }
 }

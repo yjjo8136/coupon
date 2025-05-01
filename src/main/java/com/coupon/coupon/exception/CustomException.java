@@ -15,4 +15,8 @@ public class CustomException extends RuntimeException {
     public String getMessage() {
         return errorCode.getMessage();
     }
+
+    public CustomErrorCode getErrorCode() {
+        return errorCode;
+    }
 }
