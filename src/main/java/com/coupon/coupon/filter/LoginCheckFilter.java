@@ -1,11 +1,17 @@
 package com.coupon.coupon.filter;
 
+import com.coupon.coupon.exception.CustomErrorCode;
+import com.coupon.coupon.exception.CustomErrorResponse;
+import com.coupon.coupon.exception.CustomException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.annotation.Order;
 
 import java.io.IOException;
 
+@Order()
 public class LoginCheckFilter implements Filter {
     private static final String[] whiteListURLs = {"/login", "/signup"};
 
@@ -24,14 +30,27 @@ public class LoginCheckFilter implements Filter {
                 }
             }
 
-            if (httpRequest.getSession().getAttribute("currentUser") == null) {
-                httpResponse.sendRedirect("/login");
-                return; // 로그인 되어 있지 않으면 다음으로 진행하지 않음
+            if (httpRequest.getSession(false) == null)  {
+                throw new CustomException(CustomErrorCode.LOGIN_REQUIRED);
             }
             chain.doFilter(request, response);  // 다음 필터가 있으면 필터를 호출하고, 필터가 없으면 서블릿을 호출
         } catch (Exception e) {
-            httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error");
+            if ( e instanceof CustomException) {
+                CustomException customException = (CustomException) e;
+                sendErrorResponse(httpResponse, customException.getErrorCode());
+            } else {
+                sendErrorResponse(httpResponse, CustomErrorCode.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
+    private void sendErrorResponse(HttpServletResponse response, CustomErrorCode errorCode) throws IOException {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(errorCode.getStatus(), errorCode.getMessage());
+        ObjectMapper objectMapper = new ObjectMapper();
+        String responseBody = objectMapper.writeValueAsString(errorResponse);
+
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=UTF-8");
+        response.getWriter().write(responseBody);
+    }
 }
