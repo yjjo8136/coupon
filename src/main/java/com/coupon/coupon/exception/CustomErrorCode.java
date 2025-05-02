@@ -6,6 +6,7 @@ public enum CustomErrorCode {
     COUPON_ISSUANCE_ALREADY_USED(400, "이미 사용된 쿠폰입니다."),
     COUPON_EXPIRED(400, "쿠폰이 만료되었습니다."),
     COUPON_ALREADY_ISSUED(400, "이미 발급받은 쿠폰입니다."),
+    USER_ALRREADY_EXISTS(400, "이미 존재하는 사용자입니다."),
     COUPON_NOT_FOUND(404, "쿠폰을 찾을 수 없습니다."),
     COUPON_ISSUANCE_NOT_FOUND(404, "쿠폰 발급을 찾을 수 없습니다."),
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
