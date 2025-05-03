@@ -1,5 +1,6 @@
 package com.coupon.coupon.controller;
 
+import com.coupon.coupon.common.SessionConstant;
 import com.coupon.coupon.domain.Coupon;
 import com.coupon.coupon.domain.CouponIssuance;
 import com.coupon.coupon.service.CouponService;
@@ -36,7 +37,7 @@ public class CouponController {
     @PostMapping("/issueCoupon")
     public ResponseEntity<String> issueCoupon(@RequestParam("couponId") Long couponId, HttpSession session, RedirectAttributes redirectAttributes) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
-        Object currentObj = session.getAttribute("currentUser");
+        Object currentObj = session.getAttribute(SessionConstant.CURRENT_USER);
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
 
@@ -48,7 +49,7 @@ public class CouponController {
     @GetMapping("/myCoupons")
     public List<CouponIssuance> showMyCoupons(HttpSession session, Model model) {
         // 세션에서 현재 로그인한 사용자 정보 가져오기
-        Object currentObj = session.getAttribute("currentUser");
+        Object currentObj = session.getAttribute(SessionConstant.CURRENT_USER);
         // 로그인한 사용자의 ID를 가져옴
         Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
 

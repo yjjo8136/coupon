@@ -1,5 +1,6 @@
 package com.coupon.coupon.domain;
 
+import com.coupon.coupon.common.CouponIssuanceStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

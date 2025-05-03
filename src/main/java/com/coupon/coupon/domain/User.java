@@ -1,5 +1,6 @@
 package com.coupon.coupon.domain;
 
+import com.coupon.coupon.common.UserRole;
 import jakarta.persistence.*;
 
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package com.coupon.coupon.domain;
+package com.coupon.coupon.common;
 
 public enum UserRole {
     USER,

@@ -1,5 +1,8 @@
 package com.coupon.coupon.service;
 
+import com.coupon.coupon.common.CouponIssuanceStatus;
+import com.coupon.coupon.common.SessionConstant;
+import com.coupon.coupon.common.UserRole;
 import com.coupon.coupon.domain.*;
 import com.coupon.coupon.exception.CustomErrorCode;
 import com.coupon.coupon.exception.CustomException;
@@ -8,18 +11,13 @@ import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.redisson.api.RAtomicLong;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class CouponService {
@@ -48,7 +46,7 @@ public class CouponService {
     @Transactional
     public void createCoupon(Coupon coupon) {
         // 관리자 권한 확인
-        User currentUser = (User) httpSession.getAttribute("currentUser");
+        User currentUser = (User) httpSession.getAttribute(SessionConstant.CURRENT_USER);
         if (currentUser == null || !UserRole.ADMIN.equals(currentUser.getRole())) {
             throw new CustomException(CustomErrorCode.ACCESS_DENIED);
         }

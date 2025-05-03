@@ -1,5 +1,6 @@
 package com.coupon.coupon.controller;
 
+import com.coupon.coupon.common.SessionConstant;
 import com.coupon.coupon.domain.User;
 import com.coupon.coupon.repository.UserRepository;
 import com.coupon.coupon.service.UserService;
@@ -24,7 +25,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
         User savedUser = userService.signUp(user);
-        session.setAttribute("currentUser", savedUser);
+        session.setAttribute(SessionConstant.CURRENT_USER, savedUser);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
     }
 
@@ -32,7 +33,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
         User loginUser = userService.login(user);
-        session.setAttribute("currentUser", loginUser);
+        session.setAttribute(SessionConstant.CURRENT_USER, loginUser);
         return ResponseEntity.ok("로그인되었습니다.");
     }
 
