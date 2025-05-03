@@ -23,7 +23,7 @@ public class UserController {
 
     // 회원가입 처리: 이름만 입력받아서 회원 생성
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<String> signup(@ModelAttribute User user, HttpSession session) {
         User savedUser = userService.signUp(user);
         session.setAttribute(SessionConstant.CURRENT_USER, savedUser);
         return ResponseEntity.ok("회원가입이 완료되었습니다.");
@@ -31,7 +31,7 @@ public class UserController {
 
     // 로그인 처리: 입력된 이름으로 회원 조회
     @PostMapping("/login")
-    public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session) {
         User loginUser = userService.login(user);
         session.setAttribute(SessionConstant.CURRENT_USER, loginUser);
         return ResponseEntity.ok("로그인되었습니다.");

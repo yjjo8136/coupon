@@ -1,8 +1,10 @@
 package com.coupon.coupon.controller;
 
+import com.coupon.coupon.annotation.LoginUser;
 import com.coupon.coupon.common.SessionConstant;
 import com.coupon.coupon.domain.Coupon;
 import com.coupon.coupon.domain.CouponIssuance;
+import com.coupon.coupon.domain.User;
 import com.coupon.coupon.service.CouponService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class CouponController {
 
     // 전체 쿠폰 목록 조회
     @GetMapping("/couponList")
-    public List<Coupon> showCouponList(Model model) {
+    public List<Coupon> showCouponList() {
         return couponService.getAllCoupons();
     }
 
@@ -35,32 +37,23 @@ public class CouponController {
 
     // 쿠폰 발급
     @PostMapping("/issueCoupon")
-    public ResponseEntity<String> issueCoupon(@RequestParam("couponId") Long couponId, HttpSession session, RedirectAttributes redirectAttributes) {
-        // 세션에서 현재 로그인한 사용자 정보 가져오기
-        Object currentObj = session.getAttribute(SessionConstant.CURRENT_USER);
-        // 로그인한 사용자의 ID를 가져옴
-        Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
-
+    public ResponseEntity<String> issueCoupon(@RequestParam("couponId") Long couponId, @LoginUser User user) {
+        Long userId = user.getId();
         couponService.issueCoupon(couponId, userId);
         return ResponseEntity.status(HttpStatus.OK).body("쿠폰이 성공적으로 발급되었습니다.");
     }
 
     // 사용자가 발급받은 모든 쿠폰 조회
     @GetMapping("/myCoupons")
-    public List<CouponIssuance> showMyCoupons(HttpSession session, Model model) {
-        // 세션에서 현재 로그인한 사용자 정보 가져오기
-        Object currentObj = session.getAttribute(SessionConstant.CURRENT_USER);
-        // 로그인한 사용자의 ID를 가져옴
-        Long userId = ((com.coupon.coupon.domain.User) currentObj).getId();
-
+    public List<CouponIssuance> showMyCoupons(@LoginUser User user) {
+        Long userId = user.getId();
         return couponService.getMyCoupons(userId);
     }
 
     // 쿠폰 사용
     @PostMapping("/useCoupon")
-    public ResponseEntity<String> useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<String> useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId) {
         couponService.useCoupon(couponIssuanceId);
-
         return ResponseEntity.status(HttpStatus.OK).body("쿠폰이 성공적으로 사용되었습니다.");
     }
 }
