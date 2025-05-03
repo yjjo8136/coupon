@@ -1,8 +1,8 @@
 package com.coupon.coupon.filter;
 
-import com.coupon.coupon.exception.CustomErrorCode;
-import com.coupon.coupon.exception.CustomErrorResponse;
-import com.coupon.coupon.exception.CustomException;
+import com.coupon.coupon.exception.CouponErrorCode;
+import com.coupon.coupon.exception.CouponResponse;
+import com.coupon.coupon.exception.CouponException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,21 +31,21 @@ public class LoginCheckFilter implements Filter {
             }
 
             if (httpRequest.getSession(false) == null)  {
-                throw new CustomException(CustomErrorCode.LOGIN_REQUIRED);
+                throw new CouponException(CouponErrorCode.LOGIN_REQUIRED);
             }
             chain.doFilter(request, response);  // 다음 필터가 있으면 필터를 호출하고, 필터가 없으면 서블릿을 호출
         } catch (Exception e) {
-            if ( e instanceof CustomException) {
-                CustomException customException = (CustomException) e;
-                sendErrorResponse(httpResponse, customException.getErrorCode());
+            if ( e instanceof CouponException) {
+                CouponException couponException = (CouponException) e;
+                sendErrorResponse(httpResponse, couponException.getErrorCode());
             } else {
-                sendErrorResponse(httpResponse, CustomErrorCode.INTERNAL_SERVER_ERROR);
+                sendErrorResponse(httpResponse, CouponErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
     }
 
-    private void sendErrorResponse(HttpServletResponse response, CustomErrorCode errorCode) throws IOException {
-        CustomErrorResponse errorResponse = new CustomErrorResponse(errorCode.getStatus(), errorCode.getMessage());
+    private void sendErrorResponse(HttpServletResponse response, CouponErrorCode errorCode) throws IOException {
+        CouponResponse errorResponse = new CouponResponse(errorCode.getStatus(), errorCode.getMessage(), null);
         ObjectMapper objectMapper = new ObjectMapper();
         String responseBody = objectMapper.writeValueAsString(errorResponse);
 

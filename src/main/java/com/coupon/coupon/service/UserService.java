@@ -1,8 +1,8 @@
 package com.coupon.coupon.service;
 
 import com.coupon.coupon.domain.User;
-import com.coupon.coupon.exception.CustomErrorCode;
-import com.coupon.coupon.exception.CustomException;
+import com.coupon.coupon.exception.CouponErrorCode;
+import com.coupon.coupon.exception.CouponException;
 import com.coupon.coupon.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class UserService {
     public User signUp(User user) {
         // 이미 존재하는 회원인지 확인
         if (userRepository.findByName(user.getName()) != null) {
-            throw new CustomException(CustomErrorCode.USER_ALRREADY_EXISTS);
+            throw new CouponException(CouponErrorCode.USER_ALRREADY_EXISTS);
         }
         return userRepository.save(user);
     }
@@ -43,7 +43,7 @@ public class UserService {
     public User login(User user) {
         User loginUser = userRepository.findByName(user.getName());
         if (loginUser == null) {
-            throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
+            throw new CouponException(CouponErrorCode.USER_NOT_FOUND);
         }
         return loginUser;
     }

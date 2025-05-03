@@ -1,9 +1,9 @@
 package com.coupon.coupon.exception;
 
-public class CustomException extends RuntimeException {
-    private final CustomErrorCode errorCode;
+public class CouponException extends RuntimeException {
+    private final CouponErrorCode errorCode;
 
-    public CustomException(CustomErrorCode errorCode) {
+    public CouponException(CouponErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
@@ -16,7 +16,7 @@ public class CustomException extends RuntimeException {
         return errorCode.getMessage();
     }
 
-    public CustomErrorCode getErrorCode() {
+    public CouponErrorCode getErrorCode() {
         return errorCode;
     }
 }

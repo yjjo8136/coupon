@@ -4,8 +4,8 @@ import com.coupon.coupon.common.CouponIssuanceStatus;
 import com.coupon.coupon.common.SessionConstant;
 import com.coupon.coupon.common.UserRole;
 import com.coupon.coupon.domain.*;
-import com.coupon.coupon.exception.CustomErrorCode;
-import com.coupon.coupon.exception.CustomException;
+import com.coupon.coupon.exception.CouponErrorCode;
+import com.coupon.coupon.exception.CouponException;
 import com.coupon.coupon.repository.CouponIssuanceRepository;
 import com.coupon.coupon.repository.CouponRepository;
 import com.coupon.coupon.repository.UserRepository;
@@ -48,7 +48,7 @@ public class CouponService {
         // 관리자 권한 확인
         User currentUser = (User) httpSession.getAttribute(SessionConstant.CURRENT_USER);
         if (currentUser == null || !UserRole.ADMIN.equals(currentUser.getRole())) {
-            throw new CustomException(CustomErrorCode.ACCESS_DENIED);
+            throw new CouponException(CouponErrorCode.ACCESS_DENIED);
         }
         couponRepository.save(coupon);
     }
@@ -66,12 +66,12 @@ public class CouponService {
         // 쿠폰 발급 기록 존재 여부 확인
         CouponIssuance couponIssuance = couponIssuanceRepository.findByIssuanceId(couponIssuanceId);
         if (couponIssuance == null) {
-            throw new CustomException(CustomErrorCode.COUPON_ISSUANCE_NOT_FOUND);
+            throw new CouponException(CouponErrorCode.COUPON_ISSUANCE_NOT_FOUND);
         }
 
         // 쿠폰 사용 여부 확인
         if (couponIssuance.getStatus().equals(CouponIssuanceStatus.USED)) {
-            throw new CustomException(CustomErrorCode.COUPON_ISSUANCE_ALREADY_USED);
+            throw new CouponException(CouponErrorCode.COUPON_ISSUANCE_ALREADY_USED);
         }
 
         // 쿠폰 만료 여부 확인
@@ -93,7 +93,7 @@ public class CouponService {
 
         if (!counter.isExists()) {
             long dbRemaining = couponRepository.findById(couponId)
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.COUPON_NOT_FOUND))
+                    .orElseThrow(() -> new CouponException(CouponErrorCode.COUPON_NOT_FOUND))
                     .getRemainingQuantity();
             counter.set(dbRemaining);
         }
@@ -110,7 +110,7 @@ public class CouponService {
 
         // 사용자 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CouponException(CouponErrorCode.USER_NOT_FOUND));
 
         Coupon couponProxy = couponRepository.getReference(couponId);
 
@@ -124,9 +124,9 @@ public class CouponService {
     @Transactional(readOnly = true)
     public List<CouponIssuance> getMyCoupons(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(CustomErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CouponException(CouponErrorCode.USER_NOT_FOUND));
         List<CouponIssuance> couponIssuance = couponIssuanceRepository.findByUserId(user.getId());
-        return (List<CouponIssuance>) new ArrayList<CouponIssuance>(couponIssuance);
+        return couponIssuance;
     }
 
 }

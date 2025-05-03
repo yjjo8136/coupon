@@ -2,6 +2,7 @@ package com.coupon.coupon.controller;
 
 import com.coupon.coupon.common.SessionConstant;
 import com.coupon.coupon.domain.User;
+import com.coupon.coupon.exception.CouponResponse;
 import com.coupon.coupon.repository.UserRepository;
 import com.coupon.coupon.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -23,24 +24,24 @@ public class UserController {
 
     // 회원가입 처리: 이름만 입력받아서 회원 생성
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@ModelAttribute User user, HttpSession session) {
+    public CouponResponse<Void> signup(@ModelAttribute User user, HttpSession session) {
         User savedUser = userService.signUp(user);
         session.setAttribute(SessionConstant.CURRENT_USER, savedUser);
-        return ResponseEntity.ok("회원가입이 완료되었습니다.");
+        return new CouponResponse<>("회원가입이 완료되었습니다.");
     }
 
     // 로그인 처리: 입력된 이름으로 회원 조회
     @PostMapping("/login")
-    public ResponseEntity<String> login(@ModelAttribute User user, HttpSession session) {
+    public CouponResponse<Void> login(@ModelAttribute User user, HttpSession session) {
         User loginUser = userService.login(user);
         session.setAttribute(SessionConstant.CURRENT_USER, loginUser);
-        return ResponseEntity.ok("로그인되었습니다.");
+        return new CouponResponse<>("로그인에 성공했습니다.");
     }
 
     // 로그아웃 처리
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpSession session) {
+    public CouponResponse<Void> logout(HttpSession session) {
         session.invalidate();
-        return ResponseEntity.ok("로그아웃되었습니다.");
+        return new CouponResponse<>("로그아웃에 성공했습니다.");
     }
 }

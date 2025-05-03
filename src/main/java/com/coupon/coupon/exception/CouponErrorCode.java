@@ -1,6 +1,6 @@
 package com.coupon.coupon.exception;
 
-public enum CustomErrorCode {
+public enum CouponErrorCode {
     LOGIN_REQUIRED(401, "로그인 후 사용 가능합니다."),
     COUPON_OUT_OF_STOCK(400, "쿠폰 재고가 부족합니다."),
     COUPON_ISSUANCE_ALREADY_USED(400, "이미 사용된 쿠폰입니다."),
@@ -16,7 +16,7 @@ public enum CustomErrorCode {
     private final int status;
     private final String message;
 
-    CustomErrorCode(int status, String message) {
+    CouponErrorCode(int status, String message) {
         this.status = status;
         this.message = message;
     }

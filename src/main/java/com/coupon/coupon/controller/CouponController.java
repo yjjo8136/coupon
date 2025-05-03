@@ -5,6 +5,7 @@ import com.coupon.coupon.common.SessionConstant;
 import com.coupon.coupon.domain.Coupon;
 import com.coupon.coupon.domain.CouponIssuance;
 import com.coupon.coupon.domain.User;
+import com.coupon.coupon.exception.CouponResponse;
 import com.coupon.coupon.service.CouponService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,36 +25,38 @@ public class CouponController {
 
     // 전체 쿠폰 목록 조회
     @GetMapping("/couponList")
-    public List<Coupon> showCouponList() {
-        return couponService.getAllCoupons();
+    public CouponResponse<List<Coupon>> showCouponList() {
+        List<Coupon> couponList = couponService.getAllCoupons();
+        return new CouponResponse<List<Coupon>> ("쿠폰 목록 조회에 성공했습니다.", couponList);
     }
 
     // 쿠폰 추가
     @PostMapping("/addCoupon")
-    public ResponseEntity<String> addCoupon(@RequestBody Coupon coupon) {
+    public CouponResponse<Void> addCoupon(@RequestBody Coupon coupon) {
         couponService.createCoupon(coupon);
-        return ResponseEntity.status(HttpStatus.CREATED).body("쿠폰이 성공적으로 추가되었습니다.");
+        return new CouponResponse<>("쿠폰 추가에 성공했습니다.");
     }
 
     // 쿠폰 발급
     @PostMapping("/issueCoupon")
-    public ResponseEntity<String> issueCoupon(@RequestParam("couponId") Long couponId, @LoginUser User user) {
+    public CouponResponse<Void> issueCoupon(@RequestParam("couponId") Long couponId, @LoginUser User user) {
         Long userId = user.getId();
         couponService.issueCoupon(couponId, userId);
-        return ResponseEntity.status(HttpStatus.OK).body("쿠폰이 성공적으로 발급되었습니다.");
+        return new CouponResponse<>("쿠폰이 성공적으로 발급되었습니다.");
     }
 
     // 사용자가 발급받은 모든 쿠폰 조회
     @GetMapping("/myCoupons")
-    public List<CouponIssuance> showMyCoupons(@LoginUser User user) {
+    public CouponResponse<List<CouponIssuance>> showMyCoupons(@LoginUser User user) {
         Long userId = user.getId();
-        return couponService.getMyCoupons(userId);
+        List<CouponIssuance> myCouponList = couponService.getMyCoupons(userId);
+        return new CouponResponse<>("내 쿠폰 목록 조회에 성공했습니다.", myCouponList);
     }
 
     // 쿠폰 사용
     @PostMapping("/useCoupon")
-    public ResponseEntity<String> useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId) {
+    public CouponResponse<Void> useCoupon(@RequestParam("couponIssuanceId") Long couponIssuanceId) {
         couponService.useCoupon(couponIssuanceId);
-        return ResponseEntity.status(HttpStatus.OK).body("쿠폰이 성공적으로 사용되었습니다.");
+        return new CouponResponse<>("쿠폰 사용에 성공했습니다.");
     }
 }
