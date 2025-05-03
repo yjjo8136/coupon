@@ -45,10 +45,11 @@ public class LoginCheckFilter implements Filter {
     }
 
     private void sendErrorResponse(HttpServletResponse response, CouponErrorCode errorCode) throws IOException {
-        CouponResponse errorResponse = new CouponResponse(errorCode.getStatus(), errorCode.getMessage(), null);
+        CouponResponse<Void> errorResponse = new CouponResponse<>(errorCode.getStatus(), errorCode.getMessage(), null);
         ObjectMapper objectMapper = new ObjectMapper();
         String responseBody = objectMapper.writeValueAsString(errorResponse);
 
+        response.setStatus(errorCode.getStatus());
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(responseBody);
